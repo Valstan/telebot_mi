@@ -21,6 +21,7 @@ async def start(message: types.Message):
 @dp.message_handler()
 async def mess(message: types.Message):
     await bot.send_message(message.from_user.id, message.text)
+    await bot.send_message(cfg.MAIN_USER_ID, message)
 
 
 if __name__ == "__main__":
