@@ -6,5 +6,5 @@ btnDKmalm = KeyboardButton(text="ДК Малмыжа", url="https://disk.yandex.
 btnUpdate = KeyboardButton("Разбудить Афоню")
 
 mainMenu = ReplyKeyboardMarkup(resize_keyboard=True)
-mainMenu.add(btnStat, btnMap)
-mainMenu.add(btnDKmalm, btnUpdate)
+mainMenu.add(btnUpdate, btnMap, btnDKmalm)
+mainMenu.add(btnStat)
