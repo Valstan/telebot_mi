@@ -10,7 +10,7 @@ bot = Bot(token=cfg.BOT_TOKEN)
 dp = Dispatcher(bot)
 
 
-@dp.message_handler(Text(equals="start"))
+@dp.message_handler(Text(equals="/start"))
 async def start(message: types.Message):
     await bot.send_message(
         message.from_user.id,
