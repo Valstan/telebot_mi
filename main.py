@@ -60,6 +60,17 @@ async def mess(message: types.Message):
     await bot.send_message(
         message.from_user.id,
         f"Вот ссылка на фотографии из ДК Малмыжа с концерта прошедшего в апреле 2007 года "
+        f"- https://disk.yandex.ru/a/Xt6n9vXOnFSQaQ",
+        reply_markup=nav.mainMenu)
+    await bot.send_message(cfg.MAIN_USER_ID, message)
+
+
+# Доделать надо Афишу ---------------->>>>>>>>>>>>
+@dp.message_handler(lambda message: message.text == nav.btnAfisha.text)
+async def mess(message: types.Message):
+    await bot.send_message(
+        message.from_user.id,
+        f"Вот ссылка на фотографии из ДК Малмыжа с концерта прошедшего в апреле 2007 года "
         f"- https://yandex.ru/maps/20025/malmyzh/?ll=50.684234%2C56.518437&z=15",
         reply_markup=nav.mainMenu)
     await bot.send_message(cfg.MAIN_USER_ID, message)
