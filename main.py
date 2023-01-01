@@ -14,7 +14,7 @@ dp = Dispatcher(bot)
 async def start(message: types.Message):
     await bot.send_message(
         message.from_user.id,
-        f"Будь здоров, {message.from_user.first_name} {message.from_user.last_name}!\n"
+        f"Приветствую тебя, {message.from_user.first_name} {message.from_user.last_name}!\n"
         f"Меня зовут, Афоня. Я - Робот-Друг подписчиков телеграм-канала \"Малмыж Инфо\".\n"
         f"Ты можешь отправлять мне личные объявления, статьи, пожелания администрации сайта."
         f"Я все это сразу передам админу и он тебе поможет. Разместит твое объявление в ленте МалмыжИнфо, или статью, "
