@@ -1,11 +1,16 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-btnStat = KeyboardButton(text="Статистика МалмыжИнфо")
-btnMap = KeyboardButton(text="Карта Малмыжа")
-btnDKmalm = KeyboardButton(text="ДК Малмыжа")
-btnUpdate = KeyboardButton("Разбудить Афоню")
-btnAfisha = KeyboardButton("АФИША Малмыжа")
 
-mainMenu = ReplyKeyboardMarkup(resize_keyboard=True)
-mainMenu.add(btnUpdate, btnMap, btnDKmalm)
-mainMenu.add(btnStat)
+btnUpdate = KeyboardButton(text="Разбудить Афоню")
+btnMapMalm = KeyboardButton(text="Карта Малмыжа")
+btnDKmalmFhoto = KeyboardButton(text="ДК Малмыжа")
+btnAfisha = KeyboardButton(text="АФИША Малмыжа")
+btnStatMalm = KeyboardButton(text="Статистика МалмыжИнфо")
+
+
+kb = [
+    [btnUpdate, btnMapMalm, btnDKmalmFhoto],
+    [btnAfisha, btnStatMalm]
+]
+
+mainMenu = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=kb)
