@@ -1,5 +1,4 @@
 import asyncio
-import logging
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InputMediaPhoto
@@ -8,70 +7,65 @@ import config as cfg
 import markups as nav
 from afisha_mongo_base import afisha_mongo_base
 from afisha_vk_wall import afisha_vk_wall
+from get_stat_malm_info import get_stat_malm_info
+from gismeteo import gismeteo
 from message_filtre import message_filtre
+from texts import text_updateKB, text_start
 
-logging.basicConfig(level=logging.INFO)
+if cfg.mode == "develop":
+    import logging
+
+    logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=cfg.BOT_TOKEN)
 dp = Dispatcher()
 
 
-@dp.message(lambda message: message.text == "/start")
+# ----------- СТАРТ --------- START ------------- Обновить клавиатуру, Нажми Меня, Выход, Отмена -----
+@dp.message(lambda message:
+            message.text in ("/start", "Обновить клавиатуру", "Нажми меня", nav.btnEsc.text, nav.btnCancel.text))
 async def cmd_start(message: types.Message):
     if message.chat.type == "private":
-        await message.answer(
-            f"Приветствую тебя, {message.from_user.first_name} {message.from_user.last_name}!\n"
-            f"Меня зовут, Афоня. Я - Робот-Друг подписчиков телеграм-канала \"Малмыж Инфо\".\n"
-            f"Ты можешь отправлять мне личные объявления, статьи, пожелания администрации сайта."
-            f"Я все это сразу передам админу и он тебе поможет. Разместит твое объявление в ленте МалмыжИнфо, или статью, "
-            f"или просто ответит на твои вопросы.\n"
-            f"Нажимай на кнопочки меню внизу и я мгновенно покажу нужную тебе информацию!",
-            reply_markup=nav.mainMenu)
+        await message.answer(text_start(message), reply_markup=nav.kbMainMenu)
     await bot.send_message(cfg.MAIN_USER_ID, message_filtre(message))
 
 
+# Статистика Малмыж Инфо
 @dp.message(lambda message: message.text == nav.btnStatMalm.text)
 async def mess(message: types.Message):
     if message.chat.type == "private":
-        await message.answer(
-            f"Вот ссылка на статистику - https://tgstat.ru/channel/@malmyzh_info/stat",
-            reply_markup=nav.mainMenu)
+        await message.answer(f"{get_stat_malm_info()}")
     await bot.send_message(cfg.MAIN_USER_ID, message_filtre(message))
 
 
+# -------- Карта Малмыжа ----------
 @dp.message(lambda message: message.text == nav.btnMapMalm.text)
 async def mess(message: types.Message):
     if message.chat.type == "private":
         await message.answer(
-            f"Вот ссылка на карту Малмыжа - https://yandex.ru/maps/20025/malmyzh/?ll=50.684234%2C56.518437&z=15",
-            reply_markup=nav.mainMenu)
+            f"Вот ссылка на карту Малмыжа - https://yandex.ru/maps/20025/malmyzh/?ll=50.684234%2C56.518437&z=15")
     await bot.send_message(cfg.MAIN_USER_ID, message_filtre(message))
 
 
+# ----------- Обновить клавиатуру Разбудить Афоню -----------
 @dp.message(lambda message: message.text == nav.btnUpdate.text)
 async def mess(message: types.Message):
     if message.chat.type == "private":
-        await message.answer(
-            f"Упс... А я задремал? Извиняюсь )))\n"
-            f"Я уже готов исполнять твои желания. Объявление? Статью? "
-            f"Пиши, добавляй картинки и видео. Все размещу в ленте МалмыжИнфо!\n"
-            f"А можешь просто написать сообщение админу. Он ответит\n"
-            f"Возможно он сейчас тоже спит... Но я его разбужу! )",
-            reply_markup=nav.mainMenu)
+        await message.answer(text_updateKB(), reply_markup=nav.kbMainMenu)
     await bot.send_message(cfg.MAIN_USER_ID, message_filtre(message))
 
 
+# ----------- Фотографии ДК Малмыж -------------
 @dp.message(lambda message: message.text == nav.btnDKmalmFhoto.text)
 async def mess(message: types.Message):
     if message.chat.type == "private":
         await message.answer(
             f"Вот ссылка на фотографии из ДК Малмыжа с концерта прошедшего в апреле 2007 года "
-            f"- https://disk.yandex.ru/a/Xt6n9vXOnFSQaQ",
-            reply_markup=nav.mainMenu)
+            f"- https://disk.yandex.ru/a/Xt6n9vXOnFSQaQ")
     await bot.send_message(cfg.MAIN_USER_ID, message_filtre(message))
 
 
-# А Ф И Ш А - АФИША - А ф и ш а
+# --------- А Ф И Ш А - АФИША - А ф и ш а ------------
 @dp.message(lambda message: message.text == nav.btnAfisha.text)
 async def mess(message: types.Message):
     if message.chat.type == "private":
@@ -90,6 +84,51 @@ async def mess(message: types.Message):
     await bot.send_message(cfg.MAIN_USER_ID, message_filtre(message))
 
 
+# ----------- ПОГОДА ---------
+@dp.message(lambda message: message.text in (nav.btnWeather.text, "погода", "Погода"))
+async def mess(message: types.Message):
+    if message.chat.type == "private":
+        await message.answer(
+            f"{message.from_user.first_name}, выбери область, в которой находится город или село,"
+            f" в котором ты хочешь узнать погоду:", reply_markup=nav.kbWoblMenu)
+    await bot.send_message(cfg.MAIN_USER_ID, message_filtre(message))
+
+
+# ----------- ПОГОДА ОБЛАСТЬ ---------
+@dp.message(lambda message:
+            message.text in (nav.btnWoblKirov.text, nav.btnWoblTatar.text, nav.btnWoblUdmurt.text, nav.btnWoblMariel.text))
+async def mess(message: types.Message):
+    if message.chat.type == "private":
+        if message.text == "Кировская":
+            await message.answer(
+                f"{message.from_user.first_name}, ты выбрал Кировскую область."
+                f" Теперь выбери населенный пункт на кнопках внизу, или набери название сам и отправь мне его.",
+                reply_markup=nav.kbWcityMenu)
+        else:
+            await message.answer(
+                f"{message.from_user.first_name}, ты выбрал регион - {message.text}."
+                f" Теперь набери название населенного пункта и отправь мне его.")
+
+            @dp.message()
+            def pogoda_random(gorod: types.Message):
+                if gorod.chat.type == "private":
+                    gorod.answer(f"{gismeteo(f'{message.text} {gorod.text}')}", reply_markup=nav.kbWoblMenu)
+                bot.send_message(cfg.MAIN_USER_ID, message_filtre(message))
+
+    await bot.send_message(cfg.MAIN_USER_ID, message_filtre(message))
+
+
+# ----------- ПОГОДА ГОРОД ---------
+@dp.message(lambda message: message.text in
+            (nav.btnWmalmig.text, nav.btnWkalinino.text, nav.btnWsavali.text,
+             nav.btnWrogki.text, nav.btnWgonba.text, nav.btnWvpolyan.text))
+async def mess(message: types.Message):
+    if message.chat.type == "private":
+        await message.answer(f"{gismeteo(f'Кировская область {message.text}')}", reply_markup=nav.kbWcityMenu)
+    await bot.send_message(cfg.MAIN_USER_ID, message_filtre(message))
+
+
+# ПУСТОЕ ЗНАЧЕНИЕ РАНОДОМНЫЕ СТАТЬИ И ОБЪЯВЛЕНИЯ ----------
 @dp.message()
 async def mess(message: types.Message):
     if message.chat.type == "private":
@@ -97,7 +136,7 @@ async def mess(message: types.Message):
             f"Спасибо, {message.from_user.first_name}, я передам твое сообщение админу МалмыжИнфо.\n"
             f"Он его прочитает и обязательно ответит или разместит его в ленте канала.\n"
             f"Пиши еще, я буду ждать! )",
-            reply_markup=nav.mainMenu)
+            reply_markup=nav.kbMainMenu)
     await bot.send_message(cfg.MAIN_USER_ID, message_filtre(message))
 
 
